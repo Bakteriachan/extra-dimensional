@@ -49,7 +49,7 @@ def process_agreement(update: Update, ctxt: CallbackContext):
 
     update.effective_message.delete()
 
-    ctxt.user_data.setdefault('agreement', match.group(1))
+    ctxt.user_data['agreement'] = match.group(1)
 
     if ctxt.user_data.get('agreement') in ('accept',):
         update.effective_chat.send_message(
