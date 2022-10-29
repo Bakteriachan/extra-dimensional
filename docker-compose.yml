@@ -1,0 +1,11 @@
+services:
+  bot:
+    image: python:3.8-slim-buster
+    environment:
+      - TOKEN=${TOKEN}
+      - revisionchat=${revisionchat}
+      - mainchannel=${mainchannel}
+    working_dir: /bot
+    command: bash -c "pip install -r require.txt && python3 bot.py"
+    volumes: 
+      - ./:/bot
