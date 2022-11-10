@@ -1,5 +1,6 @@
 import re
 import os
+from uuid import uuid4
 
 from telegram import (
     Update,
@@ -7,11 +8,15 @@ from telegram import (
     InlineKeyboardButton,
     ReplyKeyboardMarkup,
     ReplyKeyboardRemove,
+    InputMediaPhoto,
+    InputMediaAudio,
+    InputMediaVideo,
 )
 from telegram.ext import CallbackContext
 
 import locales
 import states
+import config
 
 def start(update: Update, ctxt: CallbackContext):
     if ctxt.user_data.get('agreement', None) in (None, 'decline'):
@@ -106,59 +111,126 @@ def process_artwork_comment(update: Update, ctxt: CallbackContext):
         text = locales.artwork_content_text(lang='language'),
         reply_markup = ReplyKeyboardMarkup(
             keyboard = [
-                [locales.cancel_step_keyboard_text(lang=ctxt.user_data.get('language'))]
+                [
+                    locales.cancel_step_keyboard_text(lang=ctxt.user_data.get('language')),
+                    locales.confirm_artwork_button_text(lang=ctxt.user_data.get('language')),
+                ],
             ],
             resize_keyboard= True,
-        )
+        ),
+        parse_mode = config.PARSE_MODE,
     )
 
     return states.ARTWORK_CONTENT
 
 def process_artwork_content(update: Update, ctxt: CallbackContext):
-    try:
-        keyboard_text = locales.send_artwork_for_revision_keyboard_text(lang = ctxt.user_data.get('language'))
-        update.effective_message.copy(
-            chat_id = update.effective_chat.id,
-            caption = locales.build_artwork_caption(
-                artwork_data = {
-                    'username': ctxt.user_data.get('username'),
-                    'social_media': ctxt.user_data.get('social_media'),
-                    'artwork_comment': ctxt.user_data.get('artwork_comment'),
-                    'name': update.effective_user.first_name,
-                    'bot_username': ctxt.bot.username,
-                },
-                lang = ctxt.user_data.get('language'),
-            ),
-            reply_markup = InlineKeyboardMarkup(
-                inline_keyboard=[
-                    [
-                        InlineKeyboardButton(
-                            text = keyboard_text.get('send'),
-                            callback_data = 'revision_send',
-                        )
-                    ], [
-                        InlineKeyboardButton(
-                            text = keyboard_text.get('cancel'),
-                            callback_data = 'revision_cancel',
-                        ),
-                    ],
-                ]
+    '''
+    Process artworks sent by user
+    '''
+    if update.effective_message.photo:
+        if ctxt.user_data.get('artwork_type',None) not in ('photo', None):
+            update.effective_chat.send_message(
+                text = locales.not_the_expected_artwork(lang=ctxt.user_data.get('language')),
             )
-        )
-    except Exception as e:
-        print(e)
-        update.effective_chat.send_message(
-            text = locales.error_text(lang=ctxt.user_data.get('language')),
-            reply_markup = ReplyKeyboardRemove(),
-        )
-    else:
-        ctxt.user_data.pop('username', None)
-        ctxt.user_data.pop('social_media', None)
-        ctxt.user_data.pop('artwork_comment', None)
+            return None
+        else:
+            if ctxt.user_data.get('artwork_type', None) is None:
+                ctxt.user_data['artwork_type'] = 'photo'
+            if ctxt.user_data.get('artworks', None) is None:
+                ctxt.user_data['artworks'] = []
+
+            ctxt.user_data['artworks'].append(update.effective_message.photo[0].file_id)
+
+    if update.effective_message.audio:
+        if ctxt.user_data.get('artwork_type', None) not in ('audio', None):
+            update.effective_chat.send_message(
+                text = locales.not_the_expected_artwork(lang=ctxt.user_data.get('language')),
+            )
+            return None
+        else:
+            if ctxt.user_data.get('artwork_type', None) is None:
+                ctxt.user_data['artwork_type'] = 'audio'
+            if ctxt.user_data.get('artworks', None) is None:
+                ctxt.user_data['artworks'] = []
+
+            ctxt.user_data['artworks'].append(update.effective_message.audio.file_id)
+
+    if update.effective_message.video:
+        if ctxt.user_data.get('artwork_type', None) not in ('video', None):
+            update.effective_chat.send_message(
+                text = locales.not_the_expected_artwork(lang=ctxt.user_data.get('language')),
+            )
+            return None
+        else:
+            if ctxt.user_data.get('artwork_type', None) is None:
+                ctxt.user_data['artwork_type'] = 'video'
+            if ctxt.user_data.get('artworks', None) is None:
+                ctxt.user_data['artworks'] = []
+
+            ctxt.user_data['artworks'].append(update.effective_message.video.file_id)
+
+    update.effective_chat.send_message(
+        text = locales.artwork_received_text(lang=ctxt.user_data.get('language')),
+        parse_mode = config.PARSE_MODE,
+    )
+    return None
+
+def confirm_artworks(update: Update, ctxt: CallbackContext):
+    '''
+    User finished sending artworks
+    '''
+    media_group = []
+
+    if ctxt.user_data.get('artwork_type') in ('photo',):
+        MediaType = InputMediaPhoto
+    elif ctxt.user_data.get('artwork_type') in ('audio',):
+        MediaType = InputMediaPhoto
+    elif ctxt.user_data.get('artwork_type') in ('video',):
+        MediaType = InputMediaVideo
+
+    for artwork in ctxt.user_data.get('artworks'):
+        if len(media_group) == 0:
+            media_group.append(MediaType(
+                media = artwork,
+                caption = locales.build_artwork_caption(
+                    lang = ctxt.user_data.get('language'),
+                    artwork_data = {
+                        'username': ctxt.user_data.get('username'),
+                        'name': update.effective_user.first_name,
+                        'social_media': ctxt.user_data.get('social_media'),
+                        'artwork_comment': ctxt.user_data.get('artwork_comment'),
+                        'bot_username': ctxt.bot.username,
+                    },
+                )
+            ))
+        else:
+            media_group.append(InputMediaPhoto(media=artwork))
+
+    ctxt.user_data['media_group'] = media_group
+    update.effective_chat.send_media_group(media=media_group)
+
+
+    update.effective_chat.send_message(
+        text = locales.confirm_artwork_text(lang=ctxt.user_data.get('language')),
+        reply_markup = InlineKeyboardMarkup(inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text = locales.confirm_artwork_keyboard_text(lang=ctxt.user_data.get('language')).get('send'),
+                    callback_data = 'rev_send',
+                ),
+                InlineKeyboardButton(
+                    text = locales.confirm_artwork_keyboard_text(lang=ctxt.user_data.get('language')).get('cancel'),
+                    callback_data = 'rev_cancel'
+                ),
+            ],
+        ]),
+    )
 
 def send_to_revision(update: Update, ctxt: CallbackContext):
-
-    match = re.match(r'revision_(send|cancel)', update.callback_query.data)
+    '''
+    Send post to revision channel to be Accepted/Declined
+    '''
+    match = re.match(r'rev_(send|cancel)', update.callback_query.data)
 
     if match.group(1) is None:
         update.effective_chat.send_message(
@@ -167,25 +239,23 @@ def send_to_revision(update: Update, ctxt: CallbackContext):
         )
         return states.START
 
-    if match.group(1) == 'send':
-        update.effective_message.copy(
-            chat_id = os.getenv('revisionchat'),
-            reply_markup = InlineKeyboardMarkup(
-                inline_keyboard = [
-                    [
-                        InlineKeyboardButton(
-                            text = 'Send',
-                            callback_data = 'artwork_send',
-                        )
-                    ],
-                    [
-                        InlineKeyboardButton(
-                            text = 'Decline',
-                            callback_data = 'artwork_decline',
-                        )
-                    ],
-                ]
-            ),
+    if match.group(1).startswith('send'):
+        media_group = ctxt.user_data.get('media_group')
+
+        token = str(uuid4())
+
+        ctxt.bot_data[token] = media_group
+
+        ctxt.bot.send_media_group(chat_id=os.getenv('revisionchat'),media=media_group)
+        ctxt.bot.send_message(
+            chat_id=os.getenv('revisionchat'),
+            text = locales.send_to_mainchannel_text(lang=ctxt.user_data.get('language')),
+            reply_markup = InlineKeyboardMarkup(inline_keyboard = [[
+                InlineKeyboardButton(
+                    callback_data=f'artwork_send_{token}',
+                    text=locales.send_to_mainchannel_keyboard_text(ctxt.user_data.get('language')),
+                ),
+            ]]),
         )
 
         update.effective_chat.send_message(
@@ -197,6 +267,7 @@ def send_to_revision(update: Update, ctxt: CallbackContext):
     )
         
     update.effective_message.delete()
+    ctxt.user_data.pop('artworks')
     
     return states.START
 
@@ -204,19 +275,23 @@ def process_artwork(update: Update, ctxt: CallbackContext):
     '''
     act according to the decision of channels' admins
     '''
-    match = re.match(r'artwork_(send|decline)', update.callback_query.data)
-
+    match = re.match(r'artwork_(send_([\w\W]+)|decline)', update.callback_query.data)
     if match.group(1) is None:
         update.effective_chat.send_message(
             text = locales.error_text(lang=ctxt.user_data.get('language')),
         )
         return None
     
-    if match.group(1) == 'send':
-        update.effective_message.copy(
-            chat_id = os.getenv('mainchannel'),
-            reply_markup = None,
-        )
+    if match.group(1).startswith('send'):
+        token = match.group(2)
+        media_group = ctxt.bot_data.get(token)
+        if media_group is None:
+            update.effective_chat.send_message(
+                text = locales.error_text(lang=ctxt.user_data.get('language')),
+            )
+            return None
+        ctxt.bot.send_media_group(chat_id = os.getenv('mainchannel'),media=media_group)
+        ctxt.bot_data.pop(token)
 
     update.effective_message.delete()
     
