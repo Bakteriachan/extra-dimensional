@@ -169,3 +169,24 @@ def send_to_mainchannel_keyboard_text(lang: str):
     }
 
     return text.get(lang, text.get(default_lang))
+
+def language_not_supported_error_text(lang: str):
+    text = {
+        ES: 'Liste de lenguajes permitidos: {}'.format((', ').join(langs))
+    }
+
+    return text.get(lang, text.get(default_lang))
+
+def language_changed_text(lang: str):
+    text = {
+        ES: 'El lenguaje ha sido cambiado correctamente.',
+    }
+
+    return text.get(lang, text.get(default_lang))
+
+def wrong_language_command_format_text(lang: str):
+    text = {
+        ES: 'Debes especificar el lenguage,\nEjemlo: /language es',
+    }
+
+    return text.get(lang, text.get(default_lang))
