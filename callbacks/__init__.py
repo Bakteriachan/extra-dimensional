@@ -295,4 +295,23 @@ def process_artwork(update: Update, ctxt: CallbackContext):
 
     update.effective_message.delete()
     
-    
+def change_language(update: Update, ctxt: CallbackContext):
+    '''
+    Change the user language
+    '''
+    if len (ctxt.args) >= 1:
+        language: str = ctxt.args[0]
+        if language not in config.LANGS:
+            update.effective_chat.send_message(
+                text = locales.language_not_supported_error_text(lang = ctxt.user_data.get('language')),
+            )
+        else:
+            ctxt.user_data['language'] = language
+            update.effective_chat.send_message(
+                text = locales.language_changed_text(lang = ctxt.user_data.get('language')),
+            )
+    else:
+        update.effective_chat.send_message(
+            text = locales.wrong_language_command_format_text(lang=ctxt.user_data.get('language')),
+        )
+        return

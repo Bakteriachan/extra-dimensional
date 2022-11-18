@@ -30,6 +30,7 @@ dispatcher = updater.dispatcher
 
 dispatcher.add_handler(handlers.conv_handler)
 dispatcher.add_handler(handlers.process_artwork_handler)
+dispatcher.add_handler(handlers.change_language)
 
 updater.start_polling()
 print('BOT running with long polling',file=sys.stderr,flush=True)

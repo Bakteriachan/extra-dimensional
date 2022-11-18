@@ -55,3 +55,4 @@ conv_handler = ConversationHandler(
 )
 
 process_artwork_handler = CallbackQueryHandler(callback=callbacks.process_artwork)
+change_language = CommandHandler(command='language', callback=callbacks.change_language)
