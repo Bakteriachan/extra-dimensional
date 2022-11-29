@@ -21,4 +21,5 @@ class artwork(MessageFilter):
     def filter(self, message: Message):
         return message.photo is not None or \
                 message.audio is not None or \
-                message.video is not None
+                message.video is not None or \
+                message.document is not None

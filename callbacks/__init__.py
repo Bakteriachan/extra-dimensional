@@ -11,6 +11,7 @@ from telegram import (
     InputMediaPhoto,
     InputMediaAudio,
     InputMediaVideo,
+    InputMediaDocument,
 )
 from telegram.ext import CallbackContext
 
@@ -169,6 +170,20 @@ def process_artwork_content(update: Update, ctxt: CallbackContext):
 
             ctxt.user_data['artworks'].append(update.effective_message.video.file_id)
 
+    if update.effective_message.document:
+        if ctxt.user_data.get('artwork_type', None) not in ('document', None):
+            update.effective_chat.send_message(
+                text = locales.not_the_expected_artwork(lang=ctxt.user_data.get('language')),
+            )
+            return None
+        else:
+            if ctxt.user_data.get('artwork_type', None) is None:
+                ctxt.user_data['artwork_type'] = 'document'
+            if ctxt.user_data.get('artworks', None) is None:
+                ctxt.user_data['artworks'] = []
+        
+            ctxt.user_data['artworks'].append(update.effective_message.document.file_id)
+
     update.effective_chat.send_message(
         text = locales.artwork_received_text(lang=ctxt.user_data.get('language')),
         parse_mode = config.PARSE_MODE,
@@ -187,6 +202,9 @@ def confirm_artworks(update: Update, ctxt: CallbackContext):
         MediaType = InputMediaPhoto
     elif ctxt.user_data.get('artwork_type') in ('video',):
         MediaType = InputMediaVideo
+    elif ctxt.user_data.get('artwork_type') in ('document',):
+        MediaType = InputMediaDocument
+
 
     for artwork in ctxt.user_data.get('artworks'):
         if len(media_group) == 0:
