@@ -118,7 +118,7 @@ def build_artwork_caption(lang: str, artwork_data: dict):
     if artwork_comment is not None:
         text += f'\n\n🪧Comentario: {artwork_comment}'
     
-    text += f'\n\n🤖 Compartir Arte: @{bot_username}'
+    text += f'\n\n\n🤖 Compartir Arte: @{bot_username}'
 
     return text
 
