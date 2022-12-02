@@ -73,8 +73,8 @@ def send(update: Update, ctxt: CallbackContext):
         text = locales.username_text(lang=ctxt.user_data.get('language')),
     )
 
-    ctxt.user_data.pop('artwork_type')
-    ctxt.user_data.pop('artworks')
+    ctxt.user_data.pop('artwork_type', None)
+    ctxt.user_data.pop('artworks', None)
 
     return states.USERNAME
 
@@ -287,8 +287,8 @@ def send_to_revision(update: Update, ctxt: CallbackContext):
     )
         
     update.effective_message.delete()
-    ctxt.user_data.pop('artworks')
-    ctxt.user_data.pop('artwork_type')
+    ctxt.user_data.pop('artworks', None)
+    ctxt.user_data.pop('artwork_type', None)
     
     return states.START
 
