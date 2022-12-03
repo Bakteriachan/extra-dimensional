@@ -79,7 +79,7 @@ def send(update: Update, ctxt: CallbackContext):
     return states.USERNAME
 
 def process_username(update: Update, ctxt: CallbackContext):
-    ctxt.user_data.setdefault('username', update.effective_message.text)
+    ctxt.user_data.setdefault['username'] = update.effective_message.text
 
     update.effective_chat.send_message(
         text= locales.social_media_text(lang=ctxt.user_data.get('language')),
@@ -98,7 +98,7 @@ def process_username(update: Update, ctxt: CallbackContext):
 
 def process_social_media(update: Update, ctxt: CallbackContext):
     if update.effective_message.text not in (locales.omit_step_keyboard_text(lang=ctxt.user_data.get('language')),):
-        ctxt.user_data.setdefault('social_media', update.effective_message.text)
+        ctxt.user_data.setdefault['social_media'] = update.effective_message.text
 
     update.effective_chat.send_message(
         text = locales.artwork_comment_text(lang=ctxt.user_data.get('language')),
@@ -108,7 +108,7 @@ def process_social_media(update: Update, ctxt: CallbackContext):
 
 def process_artwork_comment(update: Update, ctxt: CallbackContext):
     if update.effective_message.text not in (locales.omit_step_keyboard_text(lang=ctxt.user_data.get('language'))):
-        ctxt.user_data.setdefault('artwork_comment', update.effective_message.text)
+        ctxt.user_data.setdefault['artwork_comment'] = update.effective_message.text
 
     update.effective_chat.send_message(
         text = locales.artwork_content_text(lang='language'),
