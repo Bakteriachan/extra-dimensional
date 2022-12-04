@@ -219,7 +219,7 @@ def confirm_artworks(update: Update, ctxt: CallbackContext):
                     lang = ctxt.user_data.get('language'),
                     artwork_data = {
                         'username': ctxt.user_data.get('username'),
-                        'name': update.effective_user.first_name,
+                        'name': update.effective_user.username if update.effective_user.username is not None else update.effective_user.first_name,
                         'social_media': ctxt.user_data.get('social_media'),
                         'artwork_comment': ctxt.user_data.get('artwork_comment'),
                         'bot_username': ctxt.bot.username,
