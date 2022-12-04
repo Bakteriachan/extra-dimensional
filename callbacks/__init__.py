@@ -75,6 +75,9 @@ def send(update: Update, ctxt: CallbackContext):
 
     ctxt.user_data.pop('artwork_type', None)
     ctxt.user_data.pop('artworks', None)
+    ctxt.user_data.pop('username', None)
+    ctxt.user_data.pop('social_media', None)
+    ctxt.user_data.pop('artwork_comment', None)
 
     return states.USERNAME
 
