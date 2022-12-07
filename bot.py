@@ -3,7 +3,7 @@ import sys
 import logging
 
 from telegram import Bot
-from telegram.ext import Updater
+from telegram.ext import Updater, PicklePersistence
 
 import handlers
 
@@ -25,7 +25,7 @@ TOKEN = os.getenv(token_env_name)
 
 dimension_bot = Bot(token=TOKEN)
 
-updater = Updater(bot=dimension_bot)
+updater = Updater(bot=dimension_bot,persistence= PicklePersistence(filename='data_persistance'))
 dispatcher = updater.dispatcher
 
 dispatcher.add_handler(handlers.conv_handler)
