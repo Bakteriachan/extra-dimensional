@@ -204,7 +204,7 @@ def confirm_artworks(update: Update, ctxt: CallbackContext):
     if ctxt.user_data.get('artwork_type') in ('photo',):
         MediaType = InputMediaPhoto
     elif ctxt.user_data.get('artwork_type') in ('audio',):
-        MediaType = InputMediaPhoto
+        MediaType = InputMediaAudio
     elif ctxt.user_data.get('artwork_type') in ('video',):
         MediaType = InputMediaVideo
     elif ctxt.user_data.get('artwork_type') in ('document',):
