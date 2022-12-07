@@ -269,7 +269,7 @@ def send_to_revision(update: Update, ctxt: CallbackContext):
 
         ctxt.bot_data[token] = media_group
 
-        ctxt.bot.send_media_group(chat_id=os.getenv('revisionchat'),media=media_group)
+        ctxt.bot_data[token[:10]] = [message.message_id for message in ctxt.bot.send_media_group(chat_id=os.getenv('revisionchat'),media=media_group)]
         ctxt.bot.send_message(
             chat_id=os.getenv('revisionchat'),
             text = locales.send_to_mainchannel_text(lang=ctxt.user_data.get('language')),
@@ -314,6 +314,15 @@ def process_artwork(update: Update, ctxt: CallbackContext):
                 text = locales.error_text(lang=ctxt.user_data.get('language')),
             )
             return None
+        for message_id in ctxt.bot_data.get(token[:10]):
+            try:
+                ctxt.bot.delete_message(
+                    chat_id = os.getenv('revisionchat'),
+                    message_id = message_id,
+                )
+            except Exception as e:
+                print(e)
+
         ctxt.bot.send_media_group(chat_id = os.getenv('mainchannel'),media=media_group)
         ctxt.bot_data.pop(token)
 
