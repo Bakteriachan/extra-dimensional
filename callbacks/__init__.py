@@ -73,6 +73,7 @@ def process_agreement(update: Update, ctxt: CallbackContext):
 def send(update: Update, ctxt: CallbackContext):
     update.effective_chat.send_message(
         text = locales.username_text(lang=ctxt.user_data.get('language')),
+        reply_markup = ReplyKeyboardRemove(),
     )
 
     ctxt.user_data.pop('artwork_type', None)
@@ -230,6 +231,14 @@ def confirm_artworks(update: Update, ctxt: CallbackContext):
             ))
         else:
             media_group.append(InputMediaPhoto(media=artwork))
+
+    ctxt.bot.delete_message(
+        chat_id = update.effective_chat.id,
+        message_id = update.effective_chat.send_message(
+            text = 'Procesando..',
+            reply_markup = ReplyKeyboardRemove(),
+        ).message_id
+    )
 
     ctxt.user_data['media_group'] = media_group
     update.effective_chat.send_media_group(media=media_group)
