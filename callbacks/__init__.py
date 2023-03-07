@@ -44,6 +44,8 @@ def start(update: Update, ctxt: CallbackContext):
             text = locales.start_text(lang=ctxt.user_data.get('laguage')),
         )
 
+    return states.START
+
 def process_agreement(update: Update, ctxt: CallbackContext):
     match = re.match(r'rules_(accept|decline)', update.callback_query.data)
 
@@ -211,7 +213,7 @@ def confirm_artworks(update: Update, ctxt: CallbackContext):
         MediaType = InputMediaDocument
 
 
-    for artwork in ctxt.user_data.get('artworks'):
+    for artwork in ctxt.user_data.get('artworks', []):
         if len(media_group) == 0:
             media_group.append(MediaType(
                 media = artwork,
