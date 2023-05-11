@@ -266,6 +266,8 @@ def send_to_revision(update: Update, ctxt: CallbackContext):
     '''
     match = re.match(r'rev_(send|cancel)', update.callback_query.data)
 
+    update.effective_message.delete()
+
     if match.group(1) is None:
         update.effective_chat.send_message(
             text = locales.error_text(lang=ctxt.user_data.get('language')),
@@ -300,7 +302,6 @@ def send_to_revision(update: Update, ctxt: CallbackContext):
         text = locales.start_text(lang=ctxt.user_data.get('language')),
     )
         
-    update.effective_message.delete()
     ctxt.user_data.pop('artworks', None)
     ctxt.user_data.pop('artwork_type', None)
     
