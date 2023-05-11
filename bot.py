@@ -4,8 +4,11 @@ import logging
 
 from telegram import Bot
 from telegram.ext import Updater, PicklePersistence
+import callbacks
 
 import handlers
+from telegram.ext import Filters
+from telegram.ext import MessageHandler
 
 logging.basicConfig(level=logging.INFO, format='[ %(asctime)s ] [ %(name)s ] [ %(levelname)s ]  { %(message)s },')
 
@@ -31,6 +34,7 @@ dispatcher = updater.dispatcher
 dispatcher.add_handler(handlers.conv_handler)
 dispatcher.add_handler(handlers.process_artwork_handler)
 dispatcher.add_handler(handlers.change_language)
+dispatcher.add_handler(MessageHandler(Filters.all, callbacks.start))
 
 updater.start_polling()
 print('BOT running with long polling',file=sys.stderr,flush=True)
