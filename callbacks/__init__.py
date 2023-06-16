@@ -195,6 +195,15 @@ def process_artwork_content(update: Update, ctxt: CallbackContext):
     update.effective_chat.send_message(
         text = locales.artwork_received_text(lang=ctxt.user_data.get('language')),
         parse_mode = config.PARSE_MODE,
+        reply_markup = ReplyKeyboardMarkup(
+            keyboard = [
+                [
+                    locales.cancel_step_keyboard_text(lang=ctxt.user_data.get('language')),
+                    locales.confirm_artwork_button_text(lang=ctxt.user_data.get('language')),
+                ],
+            ],
+            resize_keyboard= True,
+        ),
     )
     return None
 
