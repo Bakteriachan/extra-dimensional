@@ -30,7 +30,9 @@ TOKEN = os.getenv(token_env_name)
 
 dimension_bot = Bot(token=TOKEN)
 
-updater = Updater(bot=dimension_bot,persistence= PicklePersistence(filename='data_persistance'))
+persistance_filename = os.getenv('PERSISTANCE_FILENAME', 'data_persistance')
+
+updater = Updater(bot=dimension_bot,persistence= PicklePersistence(filename=persistance_filename))
 dispatcher = updater.dispatcher
 
 dispatcher.add_handler(handlers.conv_handler)
