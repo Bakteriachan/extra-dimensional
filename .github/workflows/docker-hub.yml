@@ -7,7 +7,7 @@ on:
 env:
   # Use docker.io for Docker Hub if empty
   REGISTRY: docker.io
-  IMAGE_NAME: extra-dimensional
+  IMAGE_NAME: bakteriachan/extra-dimensional
 jobs:
 
   build:
