@@ -369,3 +369,37 @@ def change_language(update: Update, ctxt: CallbackContext):
             text = locales.wrong_language_command_format_text(lang=ctxt.user_data.get('language')),
         )
         return
+
+def suggest_command(update: Update, ctxt: CallbackContext):
+    update.effective_chat.send_message(
+        text = locales.suggest_comand_text(lang = ctxt.user_data.get('language')),
+        reply_markup = ReplyKeyboardMarkup([
+                [
+                    locales.cancel_step_keyboard_text(lang = ctxt.user_data.get('language')),
+                ]
+            ],
+            resize_keyboard = True,
+        )
+    )
+
+    return states.RECEIVE_SUGGESTION_TEXT
+
+def cancel_suggest_command(update: Update, ctxt: CallbackContext):
+    update.effective_chat.send_message(text = locales.suggestion_cancelled(lang = ctxt.user_data.get('language')), reply_markup=ReplyKeyboardRemove())
+    return -1
+
+def process_suggestion_text(update: Update, ctxt: CallbackContext):
+    username = update.effective_user.username
+    first_name = update.effective_user.first_name
+    update.effective_message.forward(chat_id = os.getenv('revisionchat'))
+    text = f'Sugerencia de {first_name}'
+    if update.effective_user.username is not None:
+        text = f'{text} [@{update.effective_user.username}]'
+    ctxt.bot.send_message(chat_id = os.getenv('revisionchat'), text = text)
+
+    update.effective_chat.send_message(
+        text = locales.suggestion_message_sent_to_admins(lang = ctxt.user_data.get('language')),
+        reply_markup = ReplyKeyboardRemove(),
+    )
+
+    return -1

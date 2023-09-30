@@ -1,1 +1,7 @@
 *__pycache__*
+data_persistance
+lib/
+lib64
+bin/
+.env
+pyvenv.cfg
