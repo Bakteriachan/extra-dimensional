@@ -1,11 +1,11 @@
 services:
   bot:
-    image: python:3.8-slim-buster
+    image: bakteriachan/extra-dimensional:master
     environment:
       - TOKEN=${TOKEN}
       - revisionchat=${revisionchat}
       - mainchannel=${mainchannel}
-    working_dir: /bot
-    command: bash -c "pip install -r require.txt && python3 src/bot.py"
-    volumes: 
-      - ./:/bot
+    volumes:
+      - persistence:/persistence
+volumes:
+  persistence:
