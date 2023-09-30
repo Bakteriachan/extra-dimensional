@@ -190,3 +190,18 @@ def wrong_language_command_format_text(lang: str):
     }
 
     return text.get(lang, text.get(default_lang))
+
+def suggest_comand_text(lang: str):
+    text = {
+        ES: 'Envia la sugerencia para que los admins la lean!',
+    }
+
+    return text.get(lang, text.get(default_lang))
+
+def suggestion_message_sent_to_admins(lang: str):
+    text = { ES: 'Mensaje enviado a los admins!' }
+    return text.get(lang, text.get(default_lang))
+
+def suggestion_cancelled(lang: str):
+    text = { ES: 'Operacion cancelada. Puedes usar el comand /send para enviar obras al canal' }
+    return text.get(lang, text.get(default_lang))

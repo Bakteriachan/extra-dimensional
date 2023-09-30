@@ -2,6 +2,8 @@ import os
 import sys
 import logging
 
+print(os.listdir('/bot/src'))
+
 from telegram import Bot
 from telegram.ext import Updater, PicklePersistence
 import callbacks
@@ -34,6 +36,7 @@ dispatcher = updater.dispatcher
 dispatcher.add_handler(handlers.conv_handler)
 dispatcher.add_handler(handlers.process_artwork_handler)
 dispatcher.add_handler(handlers.change_language)
+dispatcher.add_handler(handlers.sugestions_conv_handler)
 dispatcher.add_handler(MessageHandler(Filters.all & Filters.chat_type.private, callbacks.start))
 
 updater.start_polling()

@@ -22,7 +22,8 @@ CancelHandler = MessageHandler(
 
 conv_handler = ConversationHandler(
     entry_points = [
-        CommandHandler(command='start', callback=callbacks.start),
+        CommandHandler(command = 'start', callback=callbacks.start),
+        CommandHandler(command = 'send', callback=callbacks.send),
         CallbackQueryHandler(callback=callbacks.process_agreement, pattern=r'rules_(accept|decline)'),
     ], 
     states = {
@@ -56,3 +57,17 @@ conv_handler = ConversationHandler(
 
 process_artwork_handler = CallbackQueryHandler(callback=callbacks.process_artwork)
 change_language = CommandHandler(command='language', callback=callbacks.change_language)
+
+sugestions_conv_handler = ConversationHandler(
+    entry_points = [
+        CommandHandler(command='suggest', callback=callbacks.suggest_command)
+    ],
+    states = {
+        states.RECEIVE_SUGGESTION_TEXT: [
+            MessageHandler(filters=filters.button(btn_text=[locales.cancel_step_keyboard_text(lang=language) for language  in config.LANGS]), callback = callbacks.cancel_suggest_command),
+            MessageHandler(filters=filters.text, callback=callbacks.process_suggestion_text)
+        ],
+    },
+    fallbacks = [],
+)
+

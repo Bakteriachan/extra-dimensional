@@ -6,6 +6,6 @@ services:
       - revisionchat=${revisionchat}
       - mainchannel=${mainchannel}
     working_dir: /bot
-    command: bash -c "pip install -r require.txt && python3 bot.py"
+    command: bash -c "pip install -r require.txt && python3 src/bot.py"
     volumes: 
       - ./:/bot
